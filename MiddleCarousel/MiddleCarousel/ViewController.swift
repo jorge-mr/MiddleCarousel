@@ -13,10 +13,19 @@ class ViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     
     let photos = [#imageLiteral(resourceName: "photo1"),#imageLiteral(resourceName: "photo2"),#imageLiteral(resourceName: "photo3"),#imageLiteral(resourceName: "photo4"),#imageLiteral(resourceName: "photo2"),#imageLiteral(resourceName: "photo3"),#imageLiteral(resourceName: "photo4")]
+    let cellScaling: CGFloat = 0.6
     
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.isPagingEnabled = false
+        let screenSize = UIScreen.main.bounds.size
+        let cellWidth = floor(screenSize.width * cellScaling)
+        let cellHeight = floor(screenSize.height * cellScaling)
+        let insetX = (view.bounds.width - cellWidth) / 2.0
+        let insetY = (view.bounds.height - cellHeight) / 2.0
+//        let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+//        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
+        collectionView.contentInset = UIEdgeInsets(top: insetY, left: insetX, bottom: insetY, right: insetX)
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -27,21 +36,19 @@ class ViewController: UIViewController {
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIScrollViewDelegate {
     
-//    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//        print("scrollViewDidEndDecelerating")
-//    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-//        collectionView.updateInteractiveMovementTargetPosition(CGPoint(x: 0, y: 0))
-//        collectionView.scrollRectToVisible(CGRect(x: 0, y: 0, width: 100, height: 100), animated: true)
-//        let indexPaths = collectionView.indexPathsForVisibleItems
-//        collectionView.scrollToItem(at: indexPaths.last!, at: .centeredHorizontally, animated: true)
-        
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let screenSize = UIScreen.main.bounds.size
+        let cellWidth = floor(screenSize.width * cellScaling)
+        let cellHeight = floor(screenSize.height * cellScaling)
+        return CGSize(width: cellWidth, height: cellHeight)
     }
+    
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let layout = self.collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        let cellWidthIncludingSpacing = layout.itemSize.width + 0
+        let screenSize = UIScreen.main.bounds.size
+        let cellWidth = floor(screenSize.width * cellScaling)
+        let cellWidthIncludingSpacing = cellWidth + layout.minimumLineSpacing
         var offset = targetContentOffset.pointee
         let index = (offset.x + scrollView.contentInset.left) / cellWidthIncludingSpacing
         let roundedIndex = round(index)
